@@ -5,9 +5,34 @@
     <style>
       :host {
         display: block;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        background: white;
+        z-index: 2147483647;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+        transition:  500ms ease-in;
+      }
+      :host([hidden]) {
+        display: none;
+      }
+
+      :host([visible]) {
+        transform: translateZ(0) translateX(0) !important;
+        transition: 500ms ease;
+      }
+
+      :host([position="left"]) {
+        left: 0;
+        transform: translateZ(0) translateX(-100%);
+      }
+
+      :host([position="right"]) {
+        right: 0;
+        transform: translateZ(0) translateX(100%);
       }
     </style>
-    <h2>Hola [[prop1]]!</h2>
+    <slot></slot>
   </template>
 
   <script>
@@ -23,12 +48,97 @@
       static get is() { return 'yo-drawer'; }
       static get properties() {
         return {
-          prop1: {
+           /**
+           *  Estado de el drawer
+           *  @type {Boolean}
+           */
+          active: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+           /**
+           *  Cuando el drawer es visisble
+           *  Usado para las transiciones CSS
+           *  @type {Boolean}
+           */
+          visible: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: false
+          },
+
+           /**
+           *  Cuando el drawer esta oculto
+           *  Usado para las transiciones CSS
+           *  @type {Boolean}
+           */
+          hidden: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: true
+          },
+
+          /**
+           *  Posicion de el drawer
+           *  @type {String} left|right
+           */
+          position: {
             type: String,
-            value: 'yo-drawer'
+            value: 'left',
+            reflectToAttribute: true
           }
         };
       }
+      static get observers() {
+        return [
+          '_toggle(active)',
+          '_focusOnActive(active)',
+        ];
+      }
+
+      ready() {
+        super.ready();
+        this.addEventListener('focusout', e => {this._closeOnBlur(e)}, true);
+      }
+
+      /**
+       * Toggles visibilidad del drawer segun la propiedad active
+       * @param  {Boolean} Propiedad active
+       * @return {undefined}
+       */
+      _toggle(active) {
+        console.log('toggle');
+        if (active) {
+          this.hidden = false;
+          Polymer.RenderStatus.afterNextRender(this, () => this.visible = true);
+        } else {
+          this.visible = false;
+        }
+      }
+
+      /**
+       * Cierra el drawer cuando este pierde el foco
+       * @param  {Event} el evento Blur
+       * @return {undefined}
+       */
+      _closeOnBlur(e) {
+        console.log('_closeOnBlur');
+        this.active = false;
+      } 
+
+      /**
+       * Autofocus cuando el drawer es abierto
+       * @param  {Boolean} Propiedad active
+       * @return {undefined}
+       */
+      _focusOnActive(active) {
+        console.log('focus');
+        if (active) {
+          this.focus();
+        }
+      }
+
     }
 
     window.customElements.define(YoDrawer.is, YoDrawer);

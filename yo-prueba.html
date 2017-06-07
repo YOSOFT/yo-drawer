@@ -1,0 +1,41 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="yo-drawer.html">
+
+<dom-module id="yo-prueba">
+  <template>
+    <style>
+      #drawer1{
+          --yo-drawer-position: 0;
+          --yo-drawer-z-index:2;
+          padding: 10px;
+          width: 250px;
+      }
+     #drawer2{
+          --yo-drawer-close-display: block; 
+          --yo-drawer-position: 270px;
+          --yo-drawer-z-index:1;
+          padding: 10px;
+          width: 150px;
+      }
+    </style>
+    <yo-drawer id="drawer1" active="true" position="left" >
+      <span on-click="_clickHeaders">Headers</span>
+    </yo-drawer>
+    <yo-drawer id="drawer2"  position="left" >
+      <p>Segundo drawer</p>
+    </yo-drawer>
+  </template>
+  <script>
+    class YoPrueba extends Polymer.Element {
+      static get is(){return 'yo-prueba';}
+      
+      constructor(){
+        super();
+      }
+      _clickHeaders() {
+        this.$.drawer2.active= true;
+      }
+    }
+    window.customElements.define(YoPrueba.is,YoPrueba);
+  </script>
+</dom-module>
